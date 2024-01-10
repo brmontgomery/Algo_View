@@ -1,2 +1,4 @@
-﻿  main.cpp
+﻿  Graphics.cpp
+C:\Users\brian\Documents\Code\Algo_View\src\Algo_View\Graphics.cpp(18,36): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\brian\Documents\Code\Algo_View\src\Algo_View\Graphics.cpp(53): warning C4715: 'Window::init': not all control paths return a value
   Algo_View.vcxproj -> C:\Users\brian\Documents\Code\Algo_View\x64\Debug\Algo_View.exe

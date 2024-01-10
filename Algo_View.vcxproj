@@ -122,12 +122,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Algo_View\Graphics.h" />
     <ClInclude Include="vendor\include\glad\glad.h" />
     <ClInclude Include="vendor\include\glfw\glfw3.h" />
     <ClInclude Include="vendor\include\glfw\glfw3native.h" />
     <ClInclude Include="vendor\include\khr\khrplatform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Algo_View\Graphics.cpp" />
     <ClCompile Include="src\Algo_View\main.cpp" />
     <ClCompile Include="src\vendor\glad.c" />
   </ItemGroup>
