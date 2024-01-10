@@ -50,12 +50,62 @@ int Window::init(const char* title) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    clearBuffer();
 }
 
 void Window::processInput()
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void Window::render(std::vector<int>& numList) {
+    // preprocess for the loop
+        // -----
+    processInput();
+    clearBuffer();
+
+    // render
+    // ------
+    float l = (float)numList.size();
+    float widthAdder = 1 / l;
+
+    for (int i = 0; i < numList.size(); ++i)
+    {
+        glBegin(GL_POLYGON);
+
+        // + 1 so value of 0 has height of 1
+        float arrayIndexHeightRatio = 2 * (numList[i] + 1) / l;
+        float widthIndexAdder = 2 * i / l;
+
+        float leftX = -1 + widthIndexAdder;
+        float rightX = leftX + widthAdder;
+        float bottomY = -1;
+        float topY = bottomY + arrayIndexHeightRatio;
+
+        // bottom left
+        glColor4f(1, 0, 0, 0);
+        glVertex2f(leftX, bottomY);
+
+        // bottom right
+        glColor4f(0, 1, 0, 0);
+        glVertex2f(rightX, bottomY);
+
+        // top right
+        glColor4f(0, 0, 1, 0);
+        glVertex2f(rightX, topY);
+
+        // top left
+        glColor4f(0, 0, 0, 1);
+        glVertex2f(leftX, topY);
+
+        glEnd();
+    }
+
+    // loop postprocessing
+    // -------------------------------------------------------------------------------
+    postProcess();
 }
 
 int Window::close() {
