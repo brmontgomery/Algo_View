@@ -133,12 +133,12 @@ void Graphics::render(std::vector<int>& numList) {
     for (int i = 0; i < numList.size(); ++i)
     {
         // + 1 so value of 0 has height of 1
-        float arrayIndexHeight = 2 * (numList[i] + 1) / listSize;
+        float arrayIndexHeight = 1.9 * (numList[i] + 1) / listSize;
         float widthIndexAdder = 2 * i / listSize;
 
-        float leftX = -1 + widthIndexAdder;
+        float leftX = -1 + widthIndexAdder + (boxWidth / 2);
         float rightX = leftX + boxWidth;
-        float bottomY = -1;
+        float bottomY = -.95;
         float topY = bottomY + arrayIndexHeight;
 
         //create the vertices
@@ -180,7 +180,7 @@ void Graphics::render(std::vector<int>& numList) {
         indices.push_back(indice);
         indices.push_back(indice + 1);
         indices.push_back(indice + 2);
-        indices.push_back(indice + 1);
+        indices.push_back(indice);
         indices.push_back(indice + 2);
         indices.push_back(indice + 3);
 
@@ -217,7 +217,7 @@ void Graphics::render(std::vector<int>& numList) {
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
     //glDrawArrays(GL_TRIANGLES, 0, 6);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window.getWindow());
     glfwPollEvents();
