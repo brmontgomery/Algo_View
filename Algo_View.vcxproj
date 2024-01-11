@@ -126,6 +126,7 @@
     <ClInclude Include="vendor\include\glad\glad.h" />
     <ClInclude Include="vendor\include\glfw\glfw3.h" />
     <ClInclude Include="vendor\include\glfw\glfw3native.h" />
+    <ClInclude Include="vendor\include\glm\glm.hpp" />
     <ClInclude Include="vendor\include\khr\khrplatform.h" />
   </ItemGroup>
   <ItemGroup>

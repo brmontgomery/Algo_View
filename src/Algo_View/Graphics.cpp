@@ -24,24 +24,25 @@ int Window::init(const char* title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     //hide window before creation so that we can center it before showing it
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    //glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
     // glfw window creation
-    window = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
-    if (window == NULL)
+    gWindow = glfwCreateWindow(windowWidth, windowHeight, "Algo_View", NULL, NULL);
+    
+    if (gWindow == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         return -1;
     }
 
     //set the window in the center
-    glfwSetWindowPos(window, monitorX + (videoMode->width - windowWidth) / 2, monitorY + (videoMode->height - windowHeight) / 2);
+    glfwSetWindowPos(gWindow, monitorX + (videoMode->width - windowWidth) / 2, monitorY + (videoMode->height - windowHeight) / 2);
     //show window after centering it
-    glfwShowWindow(window);
+    glfwShowWindow(gWindow);
 
     //finish configuring screen
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, &framebuffer_size_callback);
+    glfwMakeContextCurrent(gWindow);
+    glfwSetFramebufferSizeCallback(gWindow, &framebuffer_size_callback);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -50,76 +51,6 @@ int Window::init(const char* title) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
-    clearBuffer();
-}
-
-void Window::processInput()
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-void Window::render(std::vector<int>& numList) {
-    // preprocess for the loop
-        // -----
-    processInput();
-    clearBuffer();
-
-    // render
-    // ------
-    float l = (float)numList.size();
-    float widthAdder = 1 / l;
-
-    for (int i = 0; i < numList.size(); ++i)
-    {
-        glBegin(GL_POLYGON);
-
-        // + 1 so value of 0 has height of 1
-        float arrayIndexHeightRatio = 2 * (numList[i] + 1) / l;
-        float widthIndexAdder = 2 * i / l;
-
-        float leftX = -1 + widthIndexAdder;
-        float rightX = leftX + widthAdder;
-        float bottomY = -1;
-        float topY = bottomY + arrayIndexHeightRatio;
-
-        // bottom left
-        glColor4f(1, 0, 0, 0);
-        glVertex2f(leftX, bottomY);
-
-        // bottom right
-        glColor4f(0, 1, 0, 0);
-        glVertex2f(rightX, bottomY);
-
-        // top right
-        glColor4f(0, 0, 1, 0);
-        glVertex2f(rightX, topY);
-
-        // top left
-        glColor4f(0, 0, 0, 1);
-        glVertex2f(leftX, topY);
-
-        glEnd();
-    }
-
-    // loop postprocessing
-    // -------------------------------------------------------------------------------
-    postProcess();
-}
-
-int Window::close() {
-    return glfwWindowShouldClose(window);
-}
-
-void Window::clearBuffer() {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void Window::postProcess() {
-    glfwSwapBuffers(window);
-    glfwPollEvents();
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -133,4 +64,185 @@ void Window::framebuffer_size_callback(GLFWwindow* windowp, int width, int heigh
 
 Window::~Window() {
     glfwTerminate();
+}
+
+int Window::close() {
+    return glfwWindowShouldClose(gWindow);
+}
+
+Graphics::Graphics() {
+    window.init("Algo_View");
+    clearBuffer();
+
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    // check for shader compile errors
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+    // fragment shader
+    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+    // check for shader compile errors
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+    // link shaders
+    unsigned int shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    // check for linking errors
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+}
+
+void Graphics::processInput()
+{
+    if (glfwGetKey(window.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window.getWindow(), true);
+}
+
+void Graphics::render(std::vector<int>& numList) {
+    // preprocess for the loop
+        // -----
+    processInput();
+
+    // render
+    // ------
+    float listSize = (float)numList.size();
+    float boxWidth = 1 / listSize;
+
+    unsigned int indice = 0;
+
+    for (int i = 0; i < numList.size(); ++i)
+    {
+        // + 1 so value of 0 has height of 1
+        float arrayIndexHeight = 2 * (numList[i] + 1) / listSize;
+        float widthIndexAdder = 2 * i / listSize;
+
+        float leftX = -1 + widthIndexAdder;
+        float rightX = leftX + boxWidth;
+        float bottomY = -1;
+        float topY = bottomY + arrayIndexHeight;
+
+        //create the vertices
+        Vertex vert;
+
+        //set the color to green if it is one of the ones that we are marking green
+        if (true) {
+            vert.Color.r = 1.0f;
+            vert.Color.g = 1.0f;
+            vert.Color.b = 1.0f;
+        }
+        else {
+            vert.Color.r = 0.0f;
+            vert.Color.g = 1.0f;
+            vert.Color.b = 0.0f;
+        }
+
+        //bottom left
+        vert.Position.x = leftX; 
+        vert.Position.y = bottomY;
+        vertices.push_back(vert);
+
+        // bottom right
+        vert.Position.x = rightX;
+        vert.Position.y = bottomY;
+        vertices.push_back(vert);
+
+        //top right
+        vert.Position.x = rightX;
+        vert.Position.y = topY;
+        vertices.push_back(vert);
+
+        //top left
+        vert.Position.x = leftX;
+        vert.Position.y = topY;
+        vertices.push_back(vert);
+
+        //setthe indices for the rectangle's vertices. We have 6 since we are drawing in triangles.
+        indices.push_back(indice);
+        indices.push_back(indice + 1);
+        indices.push_back(indice + 2);
+        indices.push_back(indice + 1);
+        indices.push_back(indice + 2);
+        indices.push_back(indice + 3);
+
+        indice += 4;
+    }
+
+    // create buffers/arrays
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+    // load data into vertex buffers
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // A great thing about structs is that their memory layout is sequential for all its items.
+    // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
+    // again translates to 3/2 floats which translates to a byte array.
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+    // set the vertex attribute pointers
+    // vertex Positions
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    // vertex normals
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
+
+    clearBuffer();
+
+    // draw our first triangle
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glfwSwapBuffers(window.getWindow());
+    glfwPollEvents();
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    vertices.clear();
+    indices.clear();
+}
+
+void Graphics::clearBuffer() {
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+bool Graphics::close() {
+    return (window.close());
+}
+
+void Graphics::postProcess() {
+    glfwSwapBuffers(window.getWindow());
+    glfwPollEvents();
+}
+
+Graphics::~Graphics() {
+    glDeleteProgram(shaderProgram);
 }

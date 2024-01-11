@@ -9,9 +9,9 @@
 
 #include "Graphics.h"
 
-void swapValues(int index1,int index2, std::vector<int>& numList, Window* window) {
+void swapValues(int index1,int index2, std::vector<int>& numList, Graphics& graphics) {
     std::swap(numList[index1], numList[index2]);
-    window->render(numList);
+    graphics.render(numList);
     std::this_thread::sleep_for(std::chrono::microseconds(50));
 }
 
@@ -31,14 +31,14 @@ int main()
     std::shuffle(randomNumberList.begin(), randomNumberList.end(), std::mt19937{ std::random_device{}() });
 
     //Graphics Init
-    Window* window;
-    window->init("Algo_View");
-    window->render(randomNumberList);
+    Graphics graphics;
+
+    
     // render loop
     // -----------
-    while (!window->close())
+    while (!graphics.close())
     {
-        
+        graphics.render(randomNumberList);
     }
 
     return 0;
