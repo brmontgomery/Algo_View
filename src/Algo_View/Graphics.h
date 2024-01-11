@@ -31,7 +31,7 @@ public:
 	Graphics();
 
 	void processInput();
-	void render(std::vector<int>& numList);
+	void render(std::vector<int>& numList, int index1, int index2);
 
 	void clearBuffer();
 	void postProcess();
@@ -42,23 +42,26 @@ public:
 
 private:
 	Window window;
-	const char* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec2 aPos;\n"
-		"layout (location = 1) in vec3 aColor;\n"
 
-		"out vec3 Color;\n"
+	const char* vertexShaderSource = "#version 330 core\n"
+		"layout (location = 0) in vec2 inPos;\n"
+		"layout (location = 1) in vec3 inColor;\n"
+
+		"out vec4 vertColor;\n"
 
 		"void main()\n"
 		"{\n"
-		"   gl_Position = vec4(aPos,1.0f, 1.0f);\n"
+		"   gl_Position = vec4(inPos,1.0f, 1.0f);\n"
+		"	vertColor = vec4(inColor, 1.0f);\n"
 		"}\0";
 	const char* fragmentShaderSource = "#version 330 core\n"
 		"out vec4 FragColor; \n"
-		"in vec3 Color;\n"
+		"in vec4 vertColor;\n"
 		"void main()\n"
 		"{\n"
-		"   FragColor = vec4(Color, 1.0f);\n"
+		"   FragColor = vec4(vertColor);\n"
 		"}\n\0";
+
 	unsigned int shaderProgram;
 	unsigned int VAO, VBO, EBO;
 	std::vector<Vertex> vertices;

@@ -98,7 +98,7 @@ Graphics::Graphics() {
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
     // link shaders
-    unsigned int shaderProgram = glCreateProgram();
+    shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
@@ -118,7 +118,7 @@ void Graphics::processInput()
         glfwSetWindowShouldClose(window.getWindow(), true);
 }
 
-void Graphics::render(std::vector<int>& numList) {
+void Graphics::render(std::vector<int>& numList, int index1, int index2) {
     // preprocess for the loop
         // -----
     processInput();
@@ -145,15 +145,15 @@ void Graphics::render(std::vector<int>& numList) {
         Vertex vert;
 
         //set the color to green if it is one of the ones that we are marking green
-        if (true) {
-            vert.Color.r = 1.0f;
-            vert.Color.g = 1.0f;
-            vert.Color.b = 1.0f;
-        }
-        else {
+        if (i == index1 || i == index2) {
             vert.Color.r = 0.0f;
             vert.Color.g = 1.0f;
             vert.Color.b = 0.0f;
+        }
+        else {
+            vert.Color.r = 1.0f;
+            vert.Color.g = 1.0f;
+            vert.Color.b = 1.0f;
         }
 
         //bottom left
@@ -230,8 +230,8 @@ void Graphics::render(std::vector<int>& numList) {
 }
 
 void Graphics::clearBuffer() {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 bool Graphics::close() {
