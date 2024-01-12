@@ -14,7 +14,7 @@ int main()
     //get a random list of numbers between rangeBegin and rangeEnd
     //set the begin and end values
     const int rangeBegin = 0;
-    const int rangeEnd = 1000;
+    const int rangeEnd = 50;
 
     //set the size of the number list
     std::vector<int> randomNumberList(rangeEnd - rangeBegin);
@@ -26,15 +26,17 @@ int main()
 
     //Graphics Init
     Graphics graphics;
+    AlgorithmDiags diags;
 
-    
     // render loop
     // -----------
-    while (!graphics.close())
-    {   
+    //while (!graphics.close())
+    //{   
         graphics.render(randomNumberList, -1, -1);
-        selectionSort(graphics, randomNumberList);
-    }
+        BubbleSort(graphics, randomNumberList, diags);
+        diags.print();
+        diags.clear();
+    //}
 
     return 0;
 }
