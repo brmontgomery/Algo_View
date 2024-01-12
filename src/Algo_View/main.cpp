@@ -4,24 +4,17 @@
 #include <iostream>
 #include <vector>
 #include <random>
-#include <chrono>
-#include <thread>
+
 
 #include "Graphics.h"
-
-void swapValues(int index1,int index2, std::vector<int>& numList, Graphics& graphics) {
-    std::swap(numList[index1], numList[index2]);
-    //converting to unsigned here as I have read that vectors use ints as iterators, thus you could get wierd interaction with the vector using unsigned ints as iterators.
-    graphics.render(numList, index1, index2);
-    std::this_thread::sleep_for(std::chrono::microseconds(50));
-}
+#include "Algorithm.h"
 
 int main()
 {
     //get a random list of numbers between rangeBegin and rangeEnd
     //set the begin and end values
     const int rangeBegin = 0;
-    const int rangeEnd = 10;
+    const int rangeEnd = 1000;
 
     //set the size of the number list
     std::vector<int> randomNumberList(rangeEnd - rangeBegin);
@@ -39,7 +32,8 @@ int main()
     // -----------
     while (!graphics.close())
     {   
-        swapValues(1, 2, randomNumberList, graphics);
+        graphics.render(randomNumberList, -1, -1);
+        selectionSort(graphics, randomNumberList);
     }
 
     return 0;

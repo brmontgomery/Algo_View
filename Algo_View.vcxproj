@@ -122,6 +122,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Algo_View\Algorithm.h" />
     <ClInclude Include="src\Algo_View\Graphics.h" />
     <ClInclude Include="vendor\include\glad\glad.h" />
     <ClInclude Include="vendor\include\glfw\glfw3.h" />
