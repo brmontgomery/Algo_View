@@ -1,6 +1,10 @@
 #include "Graphics.h"
 #include <iostream>
 
+#include "imgui\imgui.h"
+#include "imgui\backends\imgui_impl_glfw.h"
+#include "imgui\backends\imgui_impl_opengl3.h"
+
 int Window::init(const char* title) {
     //getting a size for the window based on the size of the screen
     //vars for getting the center of screen
@@ -218,6 +222,8 @@ void Graphics::render(std::vector<int>& numList, int index1, int index2) {
     glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+    ImGui::Render();
 
     glfwSwapBuffers(window.getWindow());
     glfwPollEvents();

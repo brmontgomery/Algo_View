@@ -38,6 +38,8 @@ public:
 
 	bool close();
 
+	GLFWwindow* getWindow() { return window.getWindow(); };
+
 	~Graphics();
 
 private:
