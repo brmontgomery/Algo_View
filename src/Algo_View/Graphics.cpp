@@ -1,9 +1,8 @@
 #include "Graphics.h"
+#include "AlgorithmStats.h"
 #include <iostream>
 
-#include "imgui\imgui.h"
-#include "imgui\backends\imgui_impl_glfw.h"
-#include "imgui\backends\imgui_impl_opengl3.h"
+#include "ImGuiImpl.h"
 
 int Window::init(const char* title) {
     //getting a size for the window based on the size of the screen
@@ -67,17 +66,31 @@ void Window::framebuffer_size_callback(GLFWwindow* windowp, int width, int heigh
 }
 
 Window::~Window() {
+    //close glfw at the end of the Graphics' object lifecycle (usually end of program)
     glfwTerminate();
 }
 
 int Window::close() {
+    //check whether the conditions havebeen met to close the window
     return glfwWindowShouldClose(gWindow);
 }
 
+// Define the static Singleton pointer
+Graphics* Graphics::inst_ = NULL;
+
+Graphics* Graphics::getInstance() {
+    if (inst_ == NULL) {
+        inst_ = new Graphics();
+    }
+    return(inst_);
+}
+
 Graphics::Graphics() {
+    //init the graphics class
     window.init("Algo_View");
     clearBuffer();
 
+    //create the shader program
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
@@ -122,13 +135,12 @@ void Graphics::processInput()
         glfwSetWindowShouldClose(window.getWindow(), true);
 }
 
-void Graphics::render(std::vector<int>& numList, int index1, int index2) {
+void Graphics::render(std::vector<int>& numList, int index1, int index2, AlgorithmStats& stats) {
     // preprocess for the loop
         // -----
     processInput();
 
-    // render
-    // ------
+    //figuring out the vertices and colors for all of the list items
     float listSize = (float)numList.size();
     float boxWidth = 1 / listSize;
 
@@ -223,7 +235,8 @@ void Graphics::render(std::vector<int>& numList, int index1, int index2) {
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
-    ImGui::Render();
+    //draw the stats so far
+    ImGuiImpl::getInstance()->stats(stats, getWindow());
 
     glfwSwapBuffers(window.getWindow());
     glfwPollEvents();

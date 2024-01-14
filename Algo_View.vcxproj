@@ -123,7 +123,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Algo_View\Algorithm.h" />
+    <ClInclude Include="src\Algo_View\AlgorithmStats.h" />
     <ClInclude Include="src\Algo_View\Graphics.h" />
+    <ClInclude Include="src\Algo_View\ImGuiImpl.h" />
     <ClInclude Include="vendor\include\glad\glad.h" />
     <ClInclude Include="vendor\include\glfw\glfw3.h" />
     <ClInclude Include="vendor\include\glfw\glfw3native.h" />
@@ -142,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Algo_View\Graphics.cpp" />
+    <ClCompile Include="src\Algo_View\ImGuiImpl.cpp" />
     <ClCompile Include="src\Algo_View\main.cpp" />
     <ClCompile Include="src\vendor\glad.c" />
     <ClCompile Include="vendor\include\imgui\imgui.cpp" />

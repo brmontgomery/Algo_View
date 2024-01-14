@@ -1,99 +1,101 @@
-#pragma once
+#ifndef _ALGORITHM_H_
+#define _ALGORITHM_H_
+
 #include <vector>
 #include <chrono>
 #include <thread>
 #include <iostream>
 
 #include "Graphics.h"
+#include "ImGuiImpl.h"
+#include "AlgorithmStats.h"
 
-class AlgorithmDiags {
-	//I'm not grading on time because I am aware that the visualization slows down the algorithm immensely, adversely affecting some algos over others
-public:
-	AlgorithmDiags() : numberOfAccesses(0), numberOfSwaps(0), numberOfComparisons(0) {}
-	void addAccess(int numAccesses) { numberOfAccesses += numAccesses; };
-	void addSwap() { numberOfSwaps += 1; numberOfAccesses += 2;};
-	void addComparison(int numAccesses) { numberOfComparisons += 1; numberOfAccesses += numAccesses; };
 
-	void print() {
-		std::cout << std::endl << std::endl << "Number of Accesses: " << std::to_string(numberOfAccesses) << std::endl;
-		std::cout << "Number of Comparisons: " << std::to_string(numberOfComparisons) << std::endl;
-		std::cout << "Number of Swaps: " << std::to_string(numberOfSwaps) << std::endl;
-	}
 
-	void clear() { numberOfAccesses = 0; numberOfSwaps = 0; numberOfComparisons = 0;}
-private:
-	//number of times we access the numList for anything. I am not counting accesses of iterators at the moment
-	int numberOfAccesses;
-	//number of times we swap values in the numList
-	int numberOfSwaps;
-	//number of times we compare values
-	int numberOfComparisons;
-};
-
-void swapValues(int index1, int index2, std::vector<int>& numList, Graphics& graphics, AlgorithmDiags& diags) {
+void swapValues(int index1, int index2, std::vector<int>& numList, AlgorithmStats& stats, bool render) {
+	Graphics* graphics = Graphics::getInstance(); 
 	std::swap(numList[index1], numList[index2]);
 	//converting to unsigned here as I have read that vectors use ints as iterators, thus you could get wierd interaction with the vector using unsigned ints as iterators.
-	graphics.render(numList, index1, index2);
-	std::this_thread::sleep_for(std::chrono::microseconds(50));
+	if (render) {
+		graphics->render(numList, index1, index2, stats);
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
+	}
 }
 
-void selectionSort(Graphics graphics, std::vector<int>& numList, AlgorithmDiags& diags) {
+/*Selction sort:
+
+*/
+void selectionSort(std::vector<int>& numList, AlgorithmStats& stats, bool render) {
+	Graphics* graphics = Graphics::getInstance(); 
 	int least = -1;
-											diags.addAccess(1);
+											stats.addAccess(1);
 	for (int i = 0; i < numList.size(); i++) {
-											diags.addComparison(3);
+											stats.addComparison(3);
 		for (int j = i; j < numList.size(); j++) {
-											diags.addComparison(3);
-											diags.addComparison(1);
+			//best place to seethat weneed to exit the algo
+			if (graphics->close()) {
+				return;
+			}
+											stats.addComparison(3);
+											stats.addComparison(1);
 			if (least == -1) {
-											diags.addAccess(1);
+											stats.addAccess(1);
 				least = j;
 			}
 			else if (numList[j] < numList[least]) {
-											diags.addComparison(4); 
-											diags.addAccess(1);
+											stats.addComparison(4); 
+											stats.addAccess(1);
 				least = j;
 			}
 			else {
 				//for the above else if on the chance it is not true
-											diags.addComparison(4);
+											stats.addComparison(4);
 			}
 		}
-											diags.addComparison(4);
-											diags.addComparison(2);
+											stats.addComparison(4);
+											stats.addComparison(2);
 		if (i != least) {
-											diags.addSwap();
-			swapValues(i, least, numList, graphics, diags);
+											stats.addSwap();
+			swapValues(i, least, numList, stats, render);
 		}
 											
-											diags.addAccess(1);
+											stats.addAccess(1);
 		least = -1;
 	}
-											diags.addComparison(3);
+											stats.addComparison(3);
 }
 
-void BubbleSort(Graphics graphics, std::vector<int>& numList, AlgorithmDiags& diags) {
+/*Bubble sort:
+
+*/
+void bubbleSort(std::vector<int>& numList, AlgorithmStats& stats, bool render) {
+	Graphics* graphics = Graphics::getInstance(); 
 	bool change = false;
-											diags.addAccess(1);
+											stats.addAccess(1);
 											
 	for (int i = 0; i < numList.size(); i++) {
-											diags.addComparison(3);
+											stats.addComparison(3);
 		change = false;
-											diags.addAccess(1);
+											stats.addAccess(1);
 		for (int j = 0; j < (numList.size() - i - 1); j++) {
-											diags.addComparison(4);
+											stats.addComparison(4);
 			if (numList[j] > numList[j + 1]) {
-											diags.addSwap();
-				swapValues(j, j + 1, numList, graphics, diags);
+				//best place to seethat weneed to exit the algo
+				if (graphics->close()) {
+					return;
+				}
+											stats.addSwap();
+				swapValues(j, j + 1, numList, stats, render);
 				change = true;
-											diags.addAccess(1);
+											stats.addAccess(1);
 			}
 		}
-											diags.addComparison(4);
-											diags.addComparison(1);
+											stats.addComparison(4);
+											stats.addComparison(1);
 		if (change = false) {
 			break;
 		}
 	}
-											diags.addComparison(3);
+											stats.addComparison(3);
 }
+#endif

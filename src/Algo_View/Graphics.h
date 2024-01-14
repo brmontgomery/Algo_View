@@ -1,9 +1,14 @@
-#pragma once
+#ifndef _GRAPHICS_H_
+#define _GRAPHICS_H_
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
 #include <vector>
+
+#include "imgui.h"
 #include "glm/glm.hpp"
+#include "AlgorithmStats.h"
 
 struct Vertex {
 	// position
@@ -26,12 +31,13 @@ private:
 	GLFWwindow* gWindow;
 };
 
+//singleton class
 class Graphics {
 public:
-	Graphics();
+	static Graphics* getInstance();
 
 	void processInput();
-	void render(std::vector<int>& numList, int index1, int index2);
+	void render(std::vector<int>& numList, int index1, int index2, AlgorithmStats& stats);
 
 	void clearBuffer();
 	void postProcess();
@@ -43,6 +49,11 @@ public:
 	~Graphics();
 
 private:
+	static Graphics* inst_;   // The one, single instance
+	Graphics(); // private constructor
+	Graphics(const Graphics&);
+	Graphics& operator=(const Graphics&);
+
 	Window window;
 
 	const char* vertexShaderSource = "#version 330 core\n"
@@ -69,3 +80,4 @@ private:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 };
+#endif
