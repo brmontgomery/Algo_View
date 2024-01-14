@@ -1,0 +1,10 @@
+﻿  Graphics.cpp
+C:\Users\brian\Documents\Code\Algo_View\src\Algo_View\Graphics.cpp(21,36): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\brian\Documents\Code\Algo_View\src\Algo_View\Graphics.cpp(149,32): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\brian\Documents\Code\Algo_View\src\Algo_View\Graphics.cpp(154,23): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\brian\Documents\Code\Algo_View\src\Algo_View\Graphics.cpp(233,46): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  ImGuiImpl.cpp
+  main.cpp
+  Generating Code...
+C:\Users\brian\Documents\Code\Algo_View\src\Algo_View\Graphics.cpp(57): warning C4715: 'Window::init': not all control paths return a value
+  Algo_View.vcxproj -> C:\Users\brian\Documents\Code\Algo_View\x64\Debug\Algo_View.exe

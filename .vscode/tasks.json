@@ -8,10 +8,14 @@
                 "/Zi",
                 "/EHsc",
                 "/nologo",
-                "/Fe${workspaceFolder}\\bin\\${fileBasenameNoExtension}.exe",
+                "/Fe${workspaceFolder}\\bin\\${workspaceFolderBasename}.exe",
                 "/Fo${workspaceFolder}\\obj\\",
                 "/Fd${workspaceFolder}\\obj\\",
-                "${file}"
+                "${workspaceFolder}\\src\\*.cpp",
+                "${workspaceFolder}\\src\\glad.c",
+                "-I./vendor/include",
+                "-L./vendor/lib",
+                "-lglfw3"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
